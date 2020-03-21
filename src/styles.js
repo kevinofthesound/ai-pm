@@ -6,8 +6,21 @@ export default (theme) => ({
 		flex: 1
 	},
 	offset: theme.mixins.toolbar,
-	peopleContainer: {
-		width: '100%'
+	inputContainer: {
+		display: 'flex',
+		flexDirection: 'column',
+		width: '100%',
+		padding: '20px'
+	},
+	buttonWrapper: {
+		marginTop: '20px'
+	},
+	details: {
+		display: 'flex',
+		flexDirection: 'column'
+	},
+	datepicker: {
+		display: 'block'
 	},
 	peopleContent: {
 		display: 'flex',
