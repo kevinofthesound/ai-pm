@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { Container, AppBar, Typography, Toolbar, Button, TextField, Paper, Box, CircularProgress } from '@material-ui/core';
 import Stepper from '@material-ui/core/Stepper';
 import Step from '@material-ui/core/Step';
@@ -16,7 +16,7 @@ import {
 
 import { Editor } from '@tinymce/tinymce-react';
 import { makeStyles } from '@material-ui/core/styles';
-
+import Fade from '@material-ui/core/Fade';
 import {DateTime} from 'luxon';
 import config from './config';
 import styles from './styles';
@@ -24,27 +24,42 @@ import drimg from './dr.png';
 const useStyles = makeStyles(styles);
 
 const loadingMsgs = [
-	'Aquiring resources...',
+	'Acquiring resources...',
 	'Compiling data...',
 	'Validating results...',
 	'Generating report...'
-]
-const replaceTypeStrings = ['&lt;Insert Type&gt;', '&lt;Insert the type of Scope&gt;'];
-const replaceDateStrings = ['&lt;Insert Date&gt;'];
-const replaceProductStrings = ['&lt;insert name of product&gt;'];
+];
+let loadingIndex = 0;
+let intervalId = null;
 const App = () => {
 	const classes = useStyles();
-	const [reportTypeText, setReportTypeText] = useState('');
+	const [loadingMsg, setLoadingMsg] = useState(loadingMsgs[0]);
 	const [isLoading, setIsLoading] = useState(false);
-	const [loadingMsg, setLoadingMsg] = useState('');
-
 	const [activeStep, setActiveStep] = React.useState(0);
 	const [reportType, setReportType] = React.useState(0);
 	const [reportDate, setReportDate] = React.useState(new Date());
 	const [productName, setProductName] = React.useState('');
 
+	useEffect(() => {
+		if(activeStep === 2) {
+			intervalId = setInterval(() => {
+				if(loadingIndex < loadingMsgs.length){
+				setLoadingMsg(loadingMsgs[loadingIndex]);
+				loadingIndex++;
+				} else {
+					setIsLoading(false);
+					loadingIndex = 0;
+					setLoadingMsg(loadingMsgs[0])
+					clearInterval(intervalId);
+				}
+			}, 1500)
+		}
+	}, [activeStep])
   const handleNext = () => {
-    setActiveStep(prevActiveStep => prevActiveStep + 1);
+		setActiveStep(prevActiveStep => prevActiveStep + 1);
+		if(activeStep === 1) {
+			setIsLoading(true);
+		}
   };
 
   const handleBack = () => {
@@ -72,18 +87,26 @@ const App = () => {
 					</Toolbar>
 				</AppBar>
 				<div className={classes.offset}/>
-				<Container maxWidth="lg">
-				<Stepper activeStep={activeStep} alternativeLabel>
-					<Step>
-						<StepLabel>Select report type</StepLabel>
-					</Step>
-					<Step>
-						<StepLabel>Enter details</StepLabel>
-					</Step>
-					<Step>
-						<StepLabel>Review report</StepLabel>
-					</Step>
-				</Stepper>
+				<Container maxWidth="lg" className={classes.container}>
+					<Stepper activeStep={activeStep} alternativeLabel className={classes.stepper}>
+						<Step>
+							<StepLabel>Select report type</StepLabel>
+						</Step>
+						<Step>
+							<StepLabel>Enter details</StepLabel>
+						</Step>
+						<Step>
+							<StepLabel>Review report</StepLabel>
+						</Step>
+					</Stepper>
+
+				{isLoading ?
+					<Paper elevation={3} className={classes.loading}>
+						<CircularProgress color="secondary" className={classes.progress}/>
+						<Typography variant="h6" display="block">{loadingMsg}</Typography>
+					</Paper>
+				:
+					<Fade in={!isLoading} timeout={1500}>
 					<Paper elevation={3} className={classes.inputContainer}>
 						{activeStep === 0 && 
 							<FormControl component="fieldset">
@@ -138,13 +161,10 @@ const App = () => {
 								</Button>
 							}
 						</Box>
+					
 					</Paper>
-					{isLoading &&
-						<Paper elevation={3} className={classes.loading}>
-							<CircularProgress color="secondary" />
-							<Typography variant="body1" display="block" ></Typography>
-						</Paper>
-					}
+				</Fade>
+				}
 				</Container>
 			</div>
 		</MuiPickersUtilsProvider>

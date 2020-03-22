@@ -2,8 +2,19 @@ export default (theme) => ({
 	app: {
 		padding: '20px'
 	},
+	container: {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center'
+	},
+	stepper: {
+		width: '100%'
+	},
 	title: {
 		flex: 1
+	},
+	progress: {
+		marginBottom: '10px'
 	},
 	offset: theme.mixins.toolbar,
 	inputContainer: {
@@ -22,32 +33,14 @@ export default (theme) => ({
 	datepicker: {
 		display: 'block'
 	},
-	peopleContent: {
-		display: 'flex',
-		padding: '20px',
-		flexDirection: 'column',
-		height: '350px',
-		overflow: 'auto'
+	backButton: {
+		marginRight: '10px'
 	},
-	inputWrapper: {
+	loading: {
+		width: '200px',
+		padding: '40px',
 		display: 'flex',
 		flexDirection: 'column',
-		'& .MuiTextField-root': {
-      margin: theme.spacing(1),
-    }
-	},
-	doc: {
-		minHeight: '400px',
-		marginTop: theme.spacing(3),
-		padding: '30px'
-	},
-	emptyDoc: {
-		minHeight: 'inherit',
-		display: 'flex',
-		alignItems: 'center',
-  	justifyContent: 'center'
-	},
-	emptyContent: {
-		textAlign: 'center'
+		alignItems: 'center'
 	}
 })
