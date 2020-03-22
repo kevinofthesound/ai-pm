@@ -13,11 +13,14 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDatePicker,
 } from '@material-ui/pickers';
+
+import { Editor } from '@tinymce/tinymce-react';
 import { makeStyles } from '@material-ui/core/styles';
 
-import DocViewer from './DocViewer';
+import {DateTime} from 'luxon';
 import config from './config';
 import styles from './styles';
+import drimg from './dr.png';
 const useStyles = makeStyles(styles);
 
 const loadingMsgs = [
@@ -26,6 +29,9 @@ const loadingMsgs = [
 	'Validating results...',
 	'Generating report...'
 ]
+const replaceTypeStrings = ['&lt;Insert Type&gt;', '&lt;Insert the type of Scope&gt;'];
+const replaceDateStrings = ['&lt;Insert Date&gt;'];
+const replaceProductStrings = ['&lt;insert name of product&gt;'];
 const App = () => {
 	const classes = useStyles();
 	const [reportTypeText, setReportTypeText] = useState('');
@@ -36,6 +42,7 @@ const App = () => {
 	const [reportType, setReportType] = React.useState(0);
 	const [reportDate, setReportDate] = React.useState(new Date());
 	const [productName, setProductName] = React.useState('');
+
   const handleNext = () => {
     setActiveStep(prevActiveStep => prevActiveStep + 1);
   };
@@ -45,7 +52,14 @@ const App = () => {
 	};
 	const handleReportTypeChange = event => {
     setReportType(parseInt(event.target.value, 10));
-  };
+	};
+	const getReport = () => {
+		return config[reportType].report.replace('&lt;Insert Type&gt;', config[reportType].title)
+		.replace('&lt;Insert the type of Scope&gt;', config[reportType].title)
+		.replace('&lt;insert name of product&gt;', productName)
+		.replace('&lt;Insert Date&gt;', DateTime.fromJSDate(reportDate).toFormat('DDD'))
+
+	}
   return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<div className={classes.app}>
@@ -98,6 +112,16 @@ const App = () => {
 									}}
 								/>
 								<TextField label="Name of product" onChange={(e)=> {setProductName(e.target.value);}}/>
+							</Box>
+						}
+						{activeStep === 2 &&
+							<Box>
+								<Editor
+									initialValue={getReport()}
+									disabled
+									inline
+								/>
+								<img src={drimg} alt="Deliverables and Reports" />
 							</Box>
 						}
 						<Box className={classes.buttonWrapper}>
