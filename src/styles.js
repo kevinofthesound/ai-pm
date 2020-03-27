@@ -50,7 +50,7 @@ export default (theme) => ({
 	},
 	tabcontainer: {
 		padding: '20px',
-		backgroundColor: '#ccc'
+		backgroundColor: '#efefef'
 	},
 	report: {
 		padding: '20px',
