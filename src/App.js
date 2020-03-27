@@ -193,7 +193,7 @@ const App = () => {
 												disabled
 												inline
 											/>
-											<img src={drimg} alt="Deliverables and Reports" />
+											<img src={drimg} alt="Deliverables and Reports" style={{width: 'fit-content'}} />
 										</Paper>
 									}
 									</Box>
@@ -227,7 +227,7 @@ const App = () => {
 												<Typography variant="subtitle1" display="block">{`${stats.s} Days`}</Typography>
 											</Box>
 											<Box className={classes.statWrapper}>
-												<Typography variant="h6" className={classes.statusTitle}>Total </Typography>
+												<Typography variant="h6" className={classes.statusTitle}>Total</Typography>
 												<Box className={classes.statusBar}  bgcolor="secondary.main" style={{width: `70%`}} />
 												<Typography variant="h6" display="block">{`${totalDays} Days`}</Typography>
 											</Box>
