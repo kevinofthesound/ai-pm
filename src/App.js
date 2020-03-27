@@ -8,6 +8,8 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 import DateFnsUtils from '@date-io/date-fns';
 import {
   MuiPickersUtilsProvider,
@@ -31,6 +33,12 @@ const loadingMsgs = [
 ];
 let loadingIndex = 0;
 let intervalId = null;
+
+const getRandomIntInclusive = (min, max)  => {
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min; //The maximum is inclusive and the minimum is inclusive 
+}
 const App = () => {
 	const classes = useStyles();
 	const [loadingMsg, setLoadingMsg] = useState(loadingMsgs[0]);
@@ -39,7 +47,9 @@ const App = () => {
 	const [reportType, setReportType] = React.useState(0);
 	const [reportDate, setReportDate] = React.useState(new Date());
 	const [productName, setProductName] = React.useState('');
-
+	const [tabValue, setTabValue] = React.useState(0);
+	const [stats, setStats] = React.useState({});
+	const [totalDays, setTotalDays] = React.useState({});
 	useEffect(() => {
 		if(activeStep === 2) {
 			intervalId = setInterval(() => {
@@ -52,9 +62,23 @@ const App = () => {
 					setLoadingMsg(loadingMsgs[0])
 					clearInterval(intervalId);
 				}
-			}, 1500)
+			}, 1500);
+
+			const newStats = {
+				e: getRandomIntInclusive(10, 15),
+				l: getRandomIntInclusive(10, 15),
+				b: getRandomIntInclusive(10, 15),
+				s: getRandomIntInclusive(30, 45),
+			};
+			let total = 0;
+			for(const type in newStats) {
+				total += newStats[type];
+			}
+			setTotalDays(total);
+			setStats(newStats);
 		}
 	}, [activeStep])
+
   const handleNext = () => {
 		setActiveStep(prevActiveStep => prevActiveStep + 1);
 		if(activeStep === 1) {
@@ -75,6 +99,13 @@ const App = () => {
 		.replace('&lt;Insert Date&gt;', DateTime.fromJSDate(reportDate).toFormat('DDD'))
 
 	}
+	const handleTabChange = (event, newValue) => {
+    setTabValue(newValue);
+	};
+	const getStatPercent = (type) => {
+		return (70/100) * (stats[type] * 100 / totalDays)
+	}
+	
   return (
 		<MuiPickersUtilsProvider utils={DateFnsUtils}>
 			<div className={classes.app}>
@@ -107,44 +138,104 @@ const App = () => {
 					</Paper>
 				:
 					<Fade in={!isLoading} timeout={1500}>
-					<Paper elevation={3} className={classes.inputContainer}>
+					<Box className={classes.wrapper}>
 						{activeStep === 0 && 
-							<FormControl component="fieldset">
-								<FormLabel component="legend">Please choose one of the following reports</FormLabel>
-								<RadioGroup aria-label="report type" name="report" value={reportType} onChange={handleReportTypeChange}>
-									<FormControlLabel value={0} control={<Radio />} label="Procuring Existing Product & Spares" />
-									<FormControlLabel value={1} control={<Radio />} label="Developing / Engineering Item" />
-									<FormControlLabel value={2} control={<Radio />} label="Providing Services (Imbedded in Program Office)" />
-								</RadioGroup>
-							</FormControl>
+							<Paper elevation={3} className={classes.inputContainer}>
+								<FormControl component="fieldset">
+									<FormLabel component="legend">Please choose one of the following reports</FormLabel>
+									<RadioGroup aria-label="report type" name="report" value={reportType} onChange={handleReportTypeChange}>
+										<FormControlLabel value={0} control={<Radio />} label="Procuring Existing Product & Spares" />
+										<FormControlLabel value={1} control={<Radio />} label="Developing / Engineering Item" />
+										<FormControlLabel value={2} control={<Radio />} label="Providing Services (Imbedded in Program Office)" />
+									</RadioGroup>
+								</FormControl>
+							</Paper>
 						}
 						{activeStep === 1 && 
-							<Box className={classes.details}>
-								<KeyboardDatePicker
-									disableToolbar
-									className={classes.datepicker}
-									variant="inline"
-									format="MM/dd/yyyy"
-									margin="normal"
-									id="date-picker-inline"
-									label="Date of report"
-									value={reportDate}
-									onChange={(date) => { setReportDate(date); }}
-									KeyboardButtonProps={{
-										'aria-label': 'change date',
-									}}
-								/>
-								<TextField label="Name of product" onChange={(e)=> {setProductName(e.target.value);}}/>
-							</Box>
+							<Paper elevation={3} className={classes.inputContainer}>
+								<Box className={classes.details}>
+									<KeyboardDatePicker
+										disableToolbar
+										className={classes.datepicker}
+										variant="inline"
+										format="MM/dd/yyyy"
+										margin="normal"
+										id="date-picker-inline"
+										label="Date of report"
+										value={reportDate}
+										onChange={(date) => { setReportDate(date); }}
+										KeyboardButtonProps={{
+											'aria-label': 'change date',
+										}}
+									/>
+									<TextField label="Name of product" onChange={(e)=> {setProductName(e.target.value);}}/>
+								</Box>
+							</Paper>
 						}
 						{activeStep === 2 &&
 							<Box>
-								<Editor
-									initialValue={getReport()}
-									disabled
-									inline
-								/>
-								<img src={drimg} alt="Deliverables and Reports" />
+								<AppBar position="static">
+									<Tabs value={tabValue} onChange={handleTabChange} aria-label="simple tabs example" centered>
+										<Tab label="Report" id="reportTab" ariaControls="reportTab-panel" />
+										<Tab label="Statistics" id="statTab" ariaControls="statTab-panel" />
+									</Tabs>
+								</AppBar>
+								<Box className={classes.tabcontainer} 	borderRadius={3} >
+								<Fade in={tabValue === 0} timeout={500}>
+									<Box
+										id={`reportTab-panel`}
+										aria-labelledby={`reportTab`}
+									>
+									{tabValue === 0 && 
+										<Paper elevation={3} className={classes.report}>
+											<Editor
+												initialValue={getReport()}
+												disabled
+												inline
+											/>
+											<img src={drimg} alt="Deliverables and Reports" />
+										</Paper>
+									}
+									</Box>
+								</Fade>
+								<Fade in={tabValue === 1} timeout={500}>
+									<Box
+										id={`reportTab-panel`}
+										aria-labelledby={`reportTab`}
+									>
+									{tabValue === 1 && 
+										<Paper elevation={3} className={classes.statReport}>
+										<Typography variant="h5" gutterBottom>Time to complete</Typography>
+											<Box className={classes.statWrapper}>
+												<Typography variant="subtitle1" className={classes.statusTitle}>Engineering Task</Typography>
+												<Box className={classes.statusBar}  bgcolor="primary.main" style={{width: `${getStatPercent('e')}%`}} />
+												<Typography variant="subtitle1" display="block">{`${stats.e} Days`}</Typography>
+											</Box>
+											<Box className={classes.statWrapper}>
+												<Typography variant="subtitle1" className={classes.statusTitle}>Logistics Task</Typography>
+												<Box className={classes.statusBar}  bgcolor="primary.main" style={{width: `${getStatPercent('l')}%`}} />
+												<Typography variant="subtitle1" display="block">{`${stats.l} Days`}</Typography>
+											</Box>
+											<Box className={classes.statWrapper}>
+												<Typography variant="subtitle1" className={classes.statusTitle}>Business Task</Typography>
+												<Box className={classes.statusBar}  bgcolor="primary.main" style={{width: `${getStatPercent('b')}%`}} />
+												<Typography variant="subtitle1" display="block">{`${stats.b} Days`}</Typography>
+											</Box>
+											<Box className={classes.statWrapper}>
+												<Typography variant="subtitle1" className={classes.statusTitle}>Staffing and Adjudication</Typography>
+												<Box className={classes.statusBar}  bgcolor="primary.main" style={{width: `${getStatPercent('s')}%`}} />
+												<Typography variant="subtitle1" display="block">{`${stats.s} Days`}</Typography>
+											</Box>
+											<Box className={classes.statWrapper}>
+												<Typography variant="h6" className={classes.statusTitle}>Total </Typography>
+												<Box className={classes.statusBar}  bgcolor="secondary.main" style={{width: `70%`}} />
+												<Typography variant="h6" display="block">{`${totalDays} Days`}</Typography>
+											</Box>
+										</Paper>
+									}
+									</Box>
+								</Fade>
+								</Box>
 							</Box>
 						}
 						<Box className={classes.buttonWrapper}>
@@ -161,8 +252,7 @@ const App = () => {
 								</Button>
 							}
 						</Box>
-					
-					</Paper>
+					</Box>
 				</Fade>
 				}
 				</Container>

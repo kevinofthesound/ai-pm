@@ -13,6 +13,11 @@ export default (theme) => ({
 	title: {
 		flex: 1
 	},
+	wrapper: {
+		display: 'flex',
+		flexDirection: 'column',
+		width: '100%',
+	},
 	progress: {
 		marginBottom: '10px'
 	},
@@ -42,5 +47,34 @@ export default (theme) => ({
 		display: 'flex',
 		flexDirection: 'column',
 		alignItems: 'center'
+	},
+	tabcontainer: {
+		padding: '20px',
+		backgroundColor: '#ccc'
+	},
+	report: {
+		padding: '20px',
+		display: 'flex',
+		flexDirection: 'column',
+	},
+	statReport: {
+		padding: '20px',
+		paddingTop: '35px',
+		paddingBottom: '35px',
+		display: 'flex',
+		flexDirection: 'column',
+	},
+	statusBar: {
+		height: '4px',
+		marginRight: '10px'
+	},
+	statusTitle: {
+		marginRight: '10px',
+		minWidth: '230px'
+	},
+	statWrapper: {
+		display: 'flex',
+		alignItems: 'center',
+		marginBottom: '10px'
 	}
 })
