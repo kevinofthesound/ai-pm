@@ -93,7 +93,7 @@ const App = () => {
     setReportType(parseInt(event.target.value, 10));
 	};
 	const getReport = () => {
-		return config[reportType].report.replace('&lt;Insert Type&gt;', config[reportType].title)
+		return config[reportType].report.replace('&lt;Insert Type&gt;', productName)
 		.replace('&lt;Insert the type of Scope&gt;', config[reportType].title)
 		.replace('&lt;insert name of product&gt;', productName)
 		.replace('&lt;Insert Date&gt;', DateTime.fromJSDate(reportDate).toFormat('DDD'))
